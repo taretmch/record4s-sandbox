@@ -19,10 +19,8 @@ import sttp.tapir.json.circe.jsonBody
 import sttp.tapir.docs.openapi.OpenAPIDocsInterpreter
 import sttp.apispec.openapi.circe.yaml.*
 
-type Person = % { val name: String; val age: Int }
-
 // 個別の Schema を定義してみる
-given Schema[Person] = Schema(
+given schema1: Schema[% { val name: String; val age: Int }] = Schema(
   schemaType = SProduct(
     List(
       SchemaType.SProductField(FieldName("name"), Schema(SString()), _.name.some),
@@ -31,16 +29,29 @@ given Schema[Person] = Schema(
   )
 )
 
+// % そのものに対して Schema 定義しないと、全ての部分型に対して Schema を作らないといけない。
+// circe の encoder/decoder を参考にあとで作ってみる
+given schema2: Schema[% { val name: String }] = Schema(
+  schemaType = SProduct(
+    List(
+      SchemaType.SProductField(FieldName("name"), Schema(SString()), _.name.some),
+    )
+  )
+)
+
 val getRecord = endpoint
   .get
   .in("record")
+  .in(
+    jsonBody[% { val name: String }]
+  )
   .out(
     jsonBody[% { val name: String; val age: Int }]
       .example(%(name = "taretmch", age = 20))
   )
 
 println(getRecord.show)
-println(summon[Schema[Person]].show)
+println(summon[Schema[% { val name: String; val age: Int }]].show)
 
 // OpenAPI 仕様書を出力してみる
 val endpoints = List(getRecord)
