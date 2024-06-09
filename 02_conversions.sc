@@ -18,6 +18,12 @@ object recordLike1 extends RecordLike[Person]:
 
 object scope:
   given RecordLike[Person] = recordLike1
+  // これはうまくいかない
+  // cannot reduce inline match with
+  //  scrutinee:  scala.compiletime.erasedValue[RecordLike_this.ElemLabels] : RecordLike_this.ElemLabel
+  //                                                                                                    
+  //  patterns :  case _:EmptyTuple
+  //              case _:*:[t @ _, ts @ _]
   val r = Record.from(person)
   println(r)
 
