@@ -59,7 +59,7 @@ val getRecord = endpoint
 
 val getNestedRecord = endpoint
   .get
-  .in("record/with/child")
+  .in("record" / "nested")
   .out(
     jsonBody[% { val name: String; val age: Int; val work: % { val company: String; val position: String }; val isStudent: Boolean }]
       .example(%(name = "taretmch", age = 20, work = %(company = "taretmch", position = "developer"), isStudent = false))
@@ -116,9 +116,9 @@ println(docs.toYaml)
 //            text/plain:
 //              schema:
 //                type: string
-//  /record%2Fwith%2Fchild:
+//  /record/nested:
 //    get:
-//      operationId: getRecord/with/child
+//      operationId: getRecordNested
 //      responses:
 //        '200':
 //          description: ''
