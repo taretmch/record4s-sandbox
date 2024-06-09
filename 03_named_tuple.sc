@@ -3,8 +3,11 @@
 
 import scala.language.experimental.namedTuples
 
-val p = (name = "taretmch", age = 20)
+import NamedTuple.*
+
+val p: NamedTuple[("name", "age"), (String, Int)] = (name = "taretmch", age = 20)
 
 println(p)
 println(p.name)
 println(p.age)
+
