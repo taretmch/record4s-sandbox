@@ -48,10 +48,7 @@ inline given schema[R <: %](using r: RecordLike[R]): Schema[R] = {
 
 val getRecord = endpoint
   .get
-  .in("record")
-  .in(
-    jsonBody[% { val name: String }]
-  )
+  .in("record" / path[Long]("id"))
   .out(
     jsonBody[% { val name: String; val age: Int }]
       .example(%(name = "taretmch", age = 20))
@@ -65,8 +62,19 @@ val getNestedRecord = endpoint
       .example(%(name = "taretmch", age = 20, work = %(company = "taretmch", position = "developer"), isStudent = false))
   )
 
+val putRecord = endpoint
+  .put
+  .in("record" / path[Long]("id"))
+  .in(
+    jsonBody[% { val name: String }]
+  )
+  .out(
+    jsonBody[% { val name: String; val age: Int }]
+      .example(%(name = "taretmch", age = 20))
+  )
+
 // OpenAPI 仕様書を出力してみる
-val endpoints = List(getRecord, getNestedRecord)
+val endpoints = List(getRecord, getNestedRecord, putRecord)
 val docs = OpenAPIDocsInterpreter().toOpenAPI(endpoints, "Test Endpoints", "1.0")
 
 println("----------")
@@ -74,12 +82,53 @@ println(docs.toYaml)
 
 //openapi: 3.1.0
 //info:
-//  title: My App
+//  title: Test Endpoints
 //  version: '1.0'
 //paths:
-//  /record:
+//  /record/{id}:
 //    get:
-//      operationId: getRecord
+//      operationId: getRecordId
+//      parameters:
+//      - name: id
+//        in: path
+//        required: true
+//        schema:
+//          type: integer
+//          format: int64
+//      responses:
+//        '200':
+//          description: ''
+//          content:
+//            application/json:
+//              schema:
+//                type: object
+//                required:
+//                - name
+//                - age
+//                properties:
+//                  name:
+//                    type: string
+//                  age:
+//                    type: integer
+//                    format: int32
+//              example:
+//                name: taretmch
+//                age: 20
+//        '400':
+//          description: 'Invalid value for: path parameter id'
+//          content:
+//            text/plain:
+//              schema:
+//                type: string
+//    put:
+//      operationId: putRecordId
+//      parameters:
+//      - name: id
+//        in: path
+//        required: true
+//        schema:
+//          type: integer
+//          format: int64
 //      requestBody:
 //        content:
 //          application/json:
@@ -111,7 +160,7 @@ println(docs.toYaml)
 //                name: taretmch
 //                age: 20
 //        '400':
-//          description: 'Invalid value for: body'
+//          description: 'Invalid value for: path parameter id, Invalid value for: body'
 //          content:
 //            text/plain:
 //              schema:
